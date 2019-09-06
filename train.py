@@ -12,6 +12,9 @@ from wavenet_vocoder.train import wavenet_train
 
 log = infolog.log
 
+# Weights and biases initialization
+import wandb
+wandb.init(project="Transformer-tacotron2")
 
 def save_seq(file, sequence, input_path):
 	'''Save Tacotron-2 training state to disk. (To skip for future runs)
