@@ -9,6 +9,7 @@ from tacotron.models.custom_decoder import CustomDecoder
 from tacotron.models.attention import LocationSensitiveAttention
 
 import numpy as np
+import horovod.tensorflow as hvd
 
 def split_func(x, split_pos):
 	rst = []
@@ -390,9 +391,10 @@ class Tacotron():
 				else:
 					self.learning_rate = tf.convert_to_tensor(hp.tacotron_initial_learning_rate)
 
-				optimizer = tf.train.AdamOptimizer(self.learning_rate, hp.tacotron_adam_beta1,
-					hp.tacotron_adam_beta2, hp.tacotron_adam_epsilon)
-
+					optimizer = tf.train.AdamOptimizer(self.learning_rate * hvd.size(), hp.tacotron_adam_beta1,
+                                        hp.tacotron_adam_beta2, hp.tacotron_adam_epsilon)
+					                                # Add Horovod Distributed Optimizer
+					optimizer = hvd.DistributedOptimizer(optimizer)
 		# 2. Compute Gradient
 		for i in range(hp.tacotron_num_gpus):
 			#  Device placement

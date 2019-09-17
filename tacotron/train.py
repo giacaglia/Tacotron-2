@@ -18,7 +18,7 @@ from tacotron.utils.symbols import symbols
 from tqdm import tqdm
 
 log = infolog.log
-
+import horovod.tensorflow as hvd
 
 def time_string():
 	return datetime.now().strftime('%Y-%m-%d %H:%M')
@@ -186,6 +186,7 @@ def train(log_dir, args, hparams):
 
 	#Memory allocation on the GPU as needed
 	config = tf.ConfigProto()
+	config.gpu_options.visible_device_list = str(hvd.local_rank())
 	config.gpu_options.allow_growth = True
 	config.allow_soft_placement = True
 
@@ -213,6 +214,7 @@ def train(log_dir, args, hparams):
 				except tf.errors.OutOfRangeError as e:
 					log('Cannot restore checkpoint: {}'.format(e), slack=True)
 			else:
+				checkpoint_path = checkpoint_path if hvd.rank() == 0 else None
 				log('Starting new training!', slack=True)
 				saver.save(sess, checkpoint_path, global_step=global_step)
 
@@ -315,6 +317,7 @@ def train(log_dir, args, hparams):
 
 
 				if step % args.checkpoint_interval == 0 or step == args.tacotron_train_steps or step == 300:
+					checkpoint_path = checkpoint_path if hvd.rank() == 0 else None
 					#Save model and current global step
 					saver.save(sess, checkpoint_path, global_step=global_step)
 
