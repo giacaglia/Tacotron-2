@@ -470,7 +470,7 @@ class WaveNet():
 		#1_000_000 is causing syntax problems for some people?! Python please :)
 		log('  WaveNet Parameters:        {:.3f} Million.'.format(np.sum([np.prod(v.get_shape().as_list()) for v in self.variables]) / 1000000))
 
-		self.ema = tf.train.ExponentialMovingAverage(decay=hparams.wavenet_ema_decay)
+		#self.ema = tf.train.ExponentialMovingAverage(decay=hparams.wavenet_ema_decay)
 
 
 	def add_loss(self):
@@ -610,7 +610,8 @@ class WaveNet():
 				#Also updates moving averages after each update step
 				#This is the optimize call instead of traditional adam_optimize one.
 				assert set(self.variables) == set(variables) #Verify all trainable variables are being averaged
-				self.optimize = self.ema.apply(variables)
+				#self.optimize = self.ema.apply(variables)
+				self.optimize = adam_optimize
 
 	def _noam_learning_rate_decay(self, init_lr, global_step, warmup_steps=4000.0):
 		# Noam scheme from tensor2tensor:

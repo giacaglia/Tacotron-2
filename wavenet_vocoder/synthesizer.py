@@ -35,7 +35,8 @@ class Synthesizer:
                                   input_lengths=self.input_lengths, synthesis_length=self.synthesis_length, test_inputs=self.targets)
 
             self._hparams = hparams
-            sh_saver = create_shadow_saver(self.model)
+            #sh_saver = create_shadow_saver(self.model)
+            saver = tf.train.Saver(max_to_keep=20)
 
             log('Loading checkpoint: {}'.format(checkpoint_path))
             # Memory allocation on the GPU as needed
@@ -46,7 +47,8 @@ class Synthesizer:
             self.session = tf.Session(config=config)
             self.session.run(tf.global_variables_initializer())
 
-        load_averaged_model(self.session, sh_saver, checkpoint_path)
+            saver.restore(self.session, checkpoint_path)
+        # load_averaged_model(self.session, sh_saver, checkpoint_path)
 
     def synthesize(self, mel_spectrograms, speaker_ids, basenames, out_dir, log_dir):
         hparams = self._hparams

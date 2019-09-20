@@ -247,7 +247,8 @@ def train(log_dir, args, hparams, input_path):
 	step = 0
 	time_window = ValueWindow(100)
 	loss_window = ValueWindow(100)
-	sh_saver = create_shadow_saver(model, global_step)
+	#sh_saver = create_shadow_saver(model, global_step)
+	saver = tf.train.Saver(max_to_keep=20)
 
 	log('Wavenet training set to a maximum of {} steps'.format(args.wavenet_train_steps))
 
@@ -271,7 +272,8 @@ def train(log_dir, args, hparams, input_path):
 
 					if (checkpoint_state and checkpoint_state.model_checkpoint_path):
 						log('Loading checkpoint {}'.format(checkpoint_state.model_checkpoint_path), slack=True)
-						load_averaged_model(sess, sh_saver, checkpoint_state.model_checkpoint_path)
+						#load_averaged_model(sess, sh_saver, checkpoint_state.model_checkpoint_path)
+						saver.restore(sess, checkpoint_state.model_checkpoint_path)
 					else:
 						log('No model to load at {}'.format(save_dir), slack=True)
 						if hparams.wavenet_weight_normalization:
@@ -318,7 +320,8 @@ def train(log_dir, args, hparams, input_path):
 
 				if step % args.checkpoint_interval == 0 or step == args.wavenet_train_steps:
 					save_log(sess, step, model, plot_dir, wav_dir, hparams=hparams, model_name=args.model)
-					save_checkpoint(sess, sh_saver, checkpoint_path, global_step)
+					#save_checkpoint(sess, sh_saver, checkpoint_path, global_step)
+					saver.save(sess, checkpoint_path, global_step=global_step)
 
 				if step % args.eval_interval == 0:
 					log('\nEvaluating at step {}'.format(step))
