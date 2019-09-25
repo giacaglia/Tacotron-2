@@ -391,10 +391,10 @@ class Tacotron():
 				else:
 					self.learning_rate = tf.convert_to_tensor(hp.tacotron_initial_learning_rate)
 
-					optimizer = tf.train.AdamOptimizer(self.learning_rate * hvd.size(), hp.tacotron_adam_beta1,
-                                        hp.tacotron_adam_beta2, hp.tacotron_adam_epsilon)
-					                                # Add Horovod Distributed Optimizer
-					optimizer = hvd.DistributedOptimizer(optimizer)
+				optimizer = tf.train.AdamOptimizer(self.learning_rate * hvd.size(), hp.tacotron_adam_beta1,
+                                    hp.tacotron_adam_beta2, hp.tacotron_adam_epsilon)
+				# Add Horovod Distributed Optimizer
+				optimizer = hvd.DistributedOptimizer(optimizer)
 		# 2. Compute Gradient
 		for i in range(hp.tacotron_num_gpus):
 			#  Device placement
