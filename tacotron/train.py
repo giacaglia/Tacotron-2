@@ -216,7 +216,8 @@ def train(log_dir, args, hparams):
 			else:
 				checkpoint_path = checkpoint_path if hvd.rank() == 0 else None
 				log('Starting new training!', slack=True)
-				saver.save(sess, checkpoint_path, global_step=global_step)
+				if checkpoint_path is not None:
+					saver.save(sess, checkpoint_path, global_step=global_step)
 
 			#initializing feeder
 			feeder.start_threads(sess)

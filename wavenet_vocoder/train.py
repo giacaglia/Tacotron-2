@@ -320,8 +320,8 @@ def train(log_dir, args, hparams, input_path):
 
 				if step % args.checkpoint_interval == 0 or step == args.wavenet_train_steps:
 					save_log(sess, step, model, plot_dir, wav_dir, hparams=hparams, model_name=args.model)
-					#save_checkpoint(sess, sh_saver, checkpoint_path, global_step)
-					saver.save(sess, checkpoint_path, global_step=global_step)
+					if checkpoint_path is not None:
+						saver.save(sess, checkpoint_path, global_step=global_step)
 
 				if step % args.eval_interval == 0:
 					log('\nEvaluating at step {}'.format(step))
