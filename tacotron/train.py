@@ -320,7 +320,8 @@ def train(log_dir, args, hparams):
 				if step % args.checkpoint_interval == 0 or step == args.tacotron_train_steps or step == 300:
 					checkpoint_path = checkpoint_path if hvd.rank() == 0 else None
 					#Save model and current global step
-					saver.save(sess, checkpoint_path, global_step=global_step)
+					if checkpoint_path is not None:
+						saver.save(sess, checkpoint_path, global_step=global_step)
 
 					log('\nSaving alignment, Mel-Spectrograms and griffin-lim inverted waveform..')
 					if hparams.predict_linear:
